@@ -57,9 +57,13 @@ def main():
 
 # Question 5:
     print '****Starting question 5****'
-    for year in range(years[-1]-10,years[-1]+1):
+    year1 = years[-1]-10
+    year2 = years[-1]
+    max_income_in_range = income.T[range(year1,year2+1)].max(axis=0).max(axis=1)
+    for year in range(year1,year2+1):
         gdp_data = get_gdp_for_year(year,income)
         result = merge_by_year(year,gdp_data,countries)
+        plt.figure()
         result.boxplot('Income', by='Region',sym='go')
         plt.suptitle('')
         plt.xlabel('Region', fontsize=18)
@@ -67,13 +71,23 @@ def main():
         plt.ylabel('GDP per capita', fontsize=18)
         plt.ylim(ymax=max_income)
         plt.title(year, fontsize=20)
-        plt.savefig('question5bp_{}.eps'.format(year))
-        print 'Saved Regional GDP per capita boxplot for year {}'.format(year)
+        plt.savefig('question5bp_{}.png'.format(year), bbox_inches='tight')
+        print 'Saved regional GDP per capita boxplot for year {}'.format(year)
         # subplot of histograms for GDP per region
+        plt.figure()
         result.Income.hist(by=result.Region,bins = 30,figsize = (10,10),xrot= 30, xlabelsize = 12, ylabelsize = 12,grid=True)
-        plt.savefig('question5h_{}.eps'.format(year))
-        print 'Saved Regional GDP per capita histogram for year {}'.format(year)
-        
+        plt.savefig('question5h_{}.png'.format(year))
+        print 'Saved regional GDP per capita histogram for year {}'.format(year)
+        grouped_result=result['Income'].groupby(result.Region)
+        plt.figure()
+        grouped_result.plot(kind='hist',legend=True)
+        plt.xlim(xmax=max_income_in_range)
+        plt.xlabel('GDP per capita', fontsize=18)
+        plt.ylabel('Number of countries', fontsize=18)
+        plt.title(year, fontsize=20)
+        plt.savefig('question5all_{}.png'.format(year))
+        print 'Saved combined regional GDP per capita histogram for year {}'.format(year)
+        plt.close("all")
     
     
 def get_gdp_for_year(year,income):
